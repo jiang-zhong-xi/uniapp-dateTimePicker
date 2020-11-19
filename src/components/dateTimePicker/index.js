@@ -1,7 +1,6 @@
 let years = {}
 let date = null
 export default function DateTime(interval = 1, startTime = '6:00', endTime = '23:00', bookDuration = 7, setDate) {
-    debugger
     this.bookDuration = bookDuration + 1 // 假如今天是11-08 5:00 bookDuration是2那么应该是到11-11 5:00
     this.interval = interval
     this.startTime = startTime
@@ -78,7 +77,7 @@ DateTime.prototype.setDateRange = function() {
 }
 // 选择年、月、日后选择器年月日的变化
 DateTime.prototype.setCurrentDate = function(year, month, day, hour, minute){
-    if(this.year_instance.seleted != year) { // 年改变，月日时分都要重置为选择第一个
+    if(this.year_instance.seleted != year && year !== undefined) { // 年改变，月日时分都要重置为选择第一个
         this.year_instance.reset(year)
         const { selected_month } = this.month_instance.getList(year)
         const { selected_day } = this.day_instance.getList(year, selected_month)
@@ -86,25 +85,25 @@ DateTime.prototype.setCurrentDate = function(year, month, day, hour, minute){
         this.minute_instance.getList(year, selected_month, selected_day, selected_hour, toShowHours, this)
         return
     }
-    if(this.month_instance.selected != month) { // 月改变，日时分都要重置为选择第一个
+    if(this.month_instance.selected != month && month !== undefined) { // 月改变，日时分都要重置为选择第一个
         this.month_instance.reset(month)
         const { selected_day } = this.day_instance.getList(year, month)
-        const { selected_hour, toShowHours } = this.hour_instance.getList(year, selected_month, selected_day, this)
+        const { selected_hour, toShowHours } = this.hour_instance.getList(year, month, selected_day, this)
         this.minute_instance.getList(year, month, selected_day, selected_hour, toShowHours, this)
         return
     }
-    if(this.day_instance.selected != day) { // 日改变，时分都要重置为选择第一个
+    if(this.day_instance.selected != day && day !== undefined) { // 日改变，时分都要重置为选择第一个
         this.day_instance.reset(day)
         const { selected_hour, toShowHours } = this.hour_instance.getList(year, month, day, this)
         this.minute_instance.getList(year, month, day, selected_hour, toShowHours, this)
         return
     }
-    if(this.hour_instance.selected != hour) { // 时改变，分要重置为选择第一个
+    if(this.hour_instance.selected != hour && hour !== undefined) { // 时改变，分要重置为选择第一个
         this.hour_instance.reset(hour)
         this.minute_instance.getList(year, month, day, hour, this.hour_instance.toShow, this)
         return
     }
-    if(this.minute_instance.seleted != minute) {
+    if(this.minute_instance.seleted != minute && minute !== undefined) {
         this.minute_instance.reset(minute)
         return
     }
@@ -118,6 +117,7 @@ function Year() {
 Year.prototype.getList = function() {
     this.toShow = Object.keys(years)
     this.seleted = this.toShow.length ? this.toShow[0] : ''
+    this.selected_index = this.toShow.length ? 0 : ''
     return {seleted_year: this.seleted}
 }
 Year.prototype.reset = function(year) {
@@ -133,6 +133,7 @@ function Month() {
 Month.prototype.getList = function(year) {
     this.toShow = Object.keys(years[year])
     this.selected = this.toShow.length ? this.toShow[0] : ''
+    this.selected_index = this.toShow.length ? 0 : ''
     return {selected_month: this.selected}
 }
 Month.prototype.reset = function(month) {
@@ -147,6 +148,7 @@ function Day() {
 Day.prototype.getList = function(year, month){
     this.toShow = years[year][month]
     this.selected = this.toShow.length ? this.toShow[0] : ''
+    this.selected_index = this.toShow.length ? 0 : ''
     return {selected_day: this.selected}
 }
 Day.prototype.reset = function(day) {
@@ -163,7 +165,7 @@ Hour.prototype.getList = function(year, month, day, context) {
     const nowDate = date.getFullYear() + '' + (date.getMonth() + 1) + '' + date.getDate()
     const changedDate = year + '' + month + '' + day
     if(nowDate === changedDate) { // 用户选择的日期正好是今天，
-        const hour = date.getHours() + context
+        const hour = date.getHours()
         const minute = date.getMinutes()
         if(hour <= context.startTime_H_M[0]) { // 当前的时间小时在开始营业小时之前，应该是开始、结束营业时间的小时
             traverseAll(context.startTime_H_M[0], context.endTime_H_M[0], this.toShow)
@@ -185,6 +187,7 @@ Hour.prototype.getList = function(year, month, day, context) {
         traverseAll(context.startTime_H_M[0], context.endTime_H_M[0], this.toShow)
     }
     this.selected = this.toShow.length ? this.toShow[0] : ''
+    this.selected_index = this.toShow.length ? 0 : ''
     return {selected_hour: this.selected, toShowHours: this.toShow}
 }
 Hour.prototype.reset = function(hour) {
@@ -240,6 +243,7 @@ Minute.prototype.getList = function(year, month, day, hour, toShowHours, context
         }
     }
     this.seleted = this.toShow.length ? this.toShow[0] : 0
+    this.selected_index = this.toShow.length ? 0 : ''
     return {seleted_minute: this.seleted}
 }
 Minute.prototype.reset = function(minute) {

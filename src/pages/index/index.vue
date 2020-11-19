@@ -18,6 +18,8 @@
 <script lang="ts">
 	import Vue from 'vue';
 	import DateTimePicker from '@/components/dateTimePicker/index.vue'
+
+	
 	export default Vue.extend({
 		components: { DateTimePicker },
 		data() {

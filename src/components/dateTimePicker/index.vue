@@ -28,7 +28,7 @@
 </template>
 <script lang="ts">
 	import Vue from 'vue'
-	const DateTime = require('./index.js')
+	import DateTime from './index.js'
 	let dateTime: any = {}
 	const date = new Date()
 
@@ -63,6 +63,16 @@
 		watch: {
 			pickerShow() {
 				this.show = true
+			},
+			show() {
+				dateTime = new DateTime(this.interval, this.startTime, this.endTime, this.bookDuration)
+				const {year_instance: year, month_instance: month, day_instance: day, hour_instance: hour, minute_instance: minute} = dateTime
+				this.years = year.toShow
+				this.months = month.toShow
+				this.days = day.toShow
+				this.hours = hour.toShow
+				this.minutes = minute.toShow
+				this.value = [0,0,0,0,0]
 			}
 		},
 		data: function () {
@@ -76,34 +86,28 @@
 			value: [0,0,0,0,0]
         }
 		},
-		onReady() {
-			dateTime = new DateTime(this.interval, this.startTime, this.endTime, this.bookDuration)
-			this.years = dateTime.toShowYeas
-			this.months = dateTime.toShowMonths
-			this.days = dateTime.toShowDays
-			this.hours = dateTime.toShowHours
-			this.minutes = dateTime.toShowMinutes
-		},
     methods: {
         bindChange: function (e: any) {
             const val = e.detail.value
-            const year = this.years[val[0]]
-            const month = this.months[val[1]]
-			const day = this.days[val[2]]
-			const hour = this.hours[val[3]]
-			const minute = this.minutes[val[4]]
-			dateTime.setCurrentDate(year, month, day, hour, minute)
-			this.years = dateTime.toShowYeas
-			this.months = dateTime.toShowMonths
-			this.days = dateTime.toShowDays
-			this.hours = dateTime.toShowHours
-			this.minutes = dateTime.toShowMinutes
+            const year_selected = this.years[val[0]]
+            const month_selected = this.months[val[1]]
+			const day_selected = this.days[val[2]]
+			const hour_selected = this.hours[val[3]]
+			const minute_selected = this.minutes[val[4]]
+			dateTime.setCurrentDate(year_selected, month_selected, day_selected, hour_selected, minute_selected)
+
+			const {year_instance: year, month_instance: month, day_instance: day, hour_instance: hour, minute_instance: minute} = dateTime
+			this.years = year.toShow
+			this.months = month.toShow
+			this.days = day.toShow
+			this.hours = hour.toShow
+			this.minutes = minute.toShow
 			this.value = [
-				dateTime.selected_year_index,
-				dateTime.selected_month_index,
-				dateTime.selected_day_index,
-				dateTime.selected_hour_index,
-				dateTime.selected_minute_index
+				year.selected_index,
+				month.selected_index,
+				day.selected_index,
+				hour.selected_index,
+				minute.selected_index
 			]
 		},
 		cancel() {
