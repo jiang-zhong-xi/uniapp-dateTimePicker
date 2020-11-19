@@ -18,3 +18,4 @@
 
 只对预约今天订单有影响，需要保证当前时间 + N小时（interval=N）在可预约服务的时间区间内。
 
+![timePicker](C:\Users\walker\Pictures\timePicker.gif)
